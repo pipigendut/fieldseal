@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+Rails seals a legacy plaintext column on the next `save`, including when the assigned plaintext is unchanged. ActiveRecord was skipping that column because the value looked unmodified.
+
 ## 0.1.0
 
 Deterministic AES-256-SIV field encryption for the Ruby gem and the Go module.

@@ -16,29 +16,29 @@ Mengganti kunci membuat ciphertext lama tidak bisa dibuka, dan lookup ikut berub
 
 ## Versi
 
-Ruby dan Go dirilis bersama lewat satu tag git. Isi file `VERSION` adalah nomornya. Tag `v0.1.0` berarti gem `0.1.0` dan modul Go `v0.1.0`.
+Ruby dan Go dirilis bersama lewat satu tag git. Isi file `VERSION` adalah nomornya. Tag `v0.1.1` berarti gem `0.1.1` dan modul Go `v0.1.1`.
 
 Service Rails yang memakai library ini berjalan di Ruby `3.2.10`. Service Go-nya di Go `1.25.0`. Gem ini menolak Ruby selain `3.2.10`.
 
 Pasang versi yang eksplisit, jangan branch `main`:
 
 ```ruby
-gem "fieldseal", git: "https://github.com/pipigendut/fieldseal.git", tag: "v0.1.0"
+gem "fieldseal", git: "https://github.com/pipigendut/fieldseal.git", tag: "v0.1.1"
 ```
 
 ```bash
-go get github.com/pipigendut/fieldseal@v0.1.0
+go get github.com/pipigendut/fieldseal@v0.1.1
 ```
 
 ```go
-require github.com/pipigendut/fieldseal v0.1.0
+require github.com/pipigendut/fieldseal v0.1.1
 ```
 
 Kalau Ruby di service naik, misalnya dari `3.2.10` ke `3.3.0`, fieldseal harus dirilis dulu untuk Ruby itu:
 
 1. Ubah `.ruby-version`, `ruby` di `Gemfile`, dan `required_ruby_version` di gemspec ke versi Ruby yang baru.
 2. Kalau versi Go ikut naik, ubah baris `go` di `go.mod`.
-3. Naikkan file `VERSION`, catat di `CHANGELOG.md`, lalu tag `v0.1.1` (patch kalau hanya runtime; minor kalau format ciphertext berubah).
+3. Naikkan file `VERSION`, catat di `CHANGELOG.md`, lalu tag berikutnya, misalnya `v0.1.2` (patch kalau hanya runtime; minor kalau format ciphertext berubah).
 4. Di Gemfile service, pindahkan `tag:` ke tag baru sekaligus ubah `ruby`.
 
 Bundler menolak memasang gem ini kalau versi Ruby service belum sama. Jangan naikkan Ruby di service sebelum tag fieldseal untuk versi itu ada.
@@ -48,7 +48,7 @@ Bundler menolak memasang gem ini kalau versi Ruby service belum sama. Jangan nai
 Tambahkan di `Gemfile`:
 
 ```ruby
-gem "fieldseal", git: "https://github.com/pipigendut/fieldseal.git", tag: "v0.1.0"
+gem "fieldseal", git: "https://github.com/pipigendut/fieldseal.git", tag: "v0.1.1"
 ```
 
 Set `FIELDSEAL_KEY`. Railtie membaca env itu dan memasang helper ke ActiveRecord. Di model, daftarkan nama kolom database:
@@ -79,7 +79,7 @@ Orang.where("orang_nik = ?", Fieldseal.encrypt(nik, column: "orang_nik"))
 ## Go
 
 ```bash
-go get github.com/pipigendut/fieldseal@v0.1.0
+go get github.com/pipigendut/fieldseal@v0.1.1
 ```
 
 ```go

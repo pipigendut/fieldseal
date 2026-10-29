@@ -16,6 +16,7 @@ class ActiveRecordTest < Minitest::Test
     ActiveRecord::Schema.define(version: 0) do
       create_table :orangs, force: true do |table|
         table.string :orang_nik
+        table.string :orang_email
       end
     end
     ActiveRecord::Base.connection.add_index :orangs, :orang_nik, unique: true
@@ -51,6 +52,39 @@ class ActiveRecordTest < Minitest::Test
     raw = row.read_attribute_before_type_cast("orang_nik")
     row.update_column(:orang_nik, Fieldseal.encrypt(raw, column: "orang_nik"))
     assert_equal legacy, OrangRecord.find_by(orang_nik: legacy).orang_nik
+  end
+
+  def test_unchanged_legacy_plaintext_is_sealed_on_save
+    legacy = "3273010101010003"
+    insert_legacy(legacy)
+    row = OrangRecord.order(:id).last
+    row.orang_nik = legacy
+    row.save!
+
+    assert_equal Fieldseal.encrypt(legacy, column: "orang_nik"), stored_nik(row.id)
+    assert_equal legacy, row.reload.orang_nik
+  end
+
+  def test_saving_another_column_seals_legacy_plaintext
+    legacy = "3273010101010004"
+    insert_legacy(legacy, email: "a@b.co")
+    row = OrangRecord.order(:id).last
+    row.orang_email = "c@d.co"
+    row.save!
+
+    assert_equal Fieldseal.encrypt(legacy, column: "orang_nik"), stored_nik(row.id)
+  end
+
+  def insert_legacy(nik, email: nil)
+    quoted_nik = ActiveRecord::Base.connection.quote(nik)
+    quoted_email = ActiveRecord::Base.connection.quote(email)
+    ActiveRecord::Base.connection.execute(
+      "INSERT INTO orangs (orang_nik, orang_email) VALUES (#{quoted_nik}, #{quoted_email})"
+    )
+  end
+
+  def stored_nik(id)
+    ActiveRecord::Base.connection.select_value("SELECT orang_nik FROM orangs WHERE id = #{id.to_i}")
   end
 
   def define_model

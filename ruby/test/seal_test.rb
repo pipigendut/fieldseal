@@ -8,7 +8,7 @@ class SealTest < Minitest::Test
   end
 
   def test_release_version
-    assert_equal "0.1.0", Fieldseal::VERSION
+    assert_equal "0.1.1", Fieldseal::VERSION
     assert_equal "3.2.10", RUBY_VERSION
   end
 

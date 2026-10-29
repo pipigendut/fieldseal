@@ -32,8 +32,17 @@ module Fieldseal
       Fieldseal.decrypt(value.to_s, column: @column)
     end
 
+    # Legacy plaintext counts as changed so an unchanged NIK is still written as ciphertext.
     def changed_in_place?(raw_old_value, new_value)
+      return true if legacy_plaintext?(raw_old_value)
+
       deserialize(raw_old_value) != new_value
+    end
+
+    private
+
+    def legacy_plaintext?(raw_old_value)
+      raw_old_value.is_a?(String) && !raw_old_value.empty? && !Fieldseal.ciphertext?(raw_old_value)
     end
   end
 
@@ -45,10 +54,25 @@ module Fieldseal
       # encrypts_deterministic marks columns whose plaintext is sealed on write and opened on read.
       # Pass database column names. Hash-style where and find_by encrypt the lookup value.
       # A SQL string such as where("orang_nik = ?", nik) does not.
+      # A stored value without the v1. prefix is sealed on the next save, even when the plaintext is unchanged.
       def encrypts_deterministic(*names)
         names.each do |name|
           attribute name, EncryptedStringType.new(name)
         end
+        before_save { seal_legacy_columns(names) }
+      end
+    end
+
+    private
+
+    # seal_legacy_columns marks plaintext columns dirty so partial UPDATE includes them.
+    def seal_legacy_columns(names)
+      names.each do |name|
+        raw = read_attribute_before_type_cast(name.to_s)
+        next unless raw.is_a?(String)
+        next if raw.empty? || Fieldseal.ciphertext?(raw)
+
+        public_send("#{name}_will_change!")
       end
     end
   end
