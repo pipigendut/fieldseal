@@ -4,14 +4,14 @@ require "logger"
 require "stringio"
 require "active_record"
 require_relative "helper"
-require "coinx/pii/active_record"
+require "fieldseal/active_record"
 
 class ActiveRecordTest < Minitest::Test
   def setup
-    Coinx::PII.key = TEST_KEY
+    Fieldseal.key = TEST_KEY
     @log = StringIO.new
     ActiveRecord::Base.logger = Logger.new(@log)
-    ActiveRecord::Base.include Coinx::PII::ActiveRecord
+    ActiveRecord::Base.include Fieldseal::ActiveRecord
     ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
     ActiveRecord::Schema.define(version: 0) do
       create_table :orangs, force: true do |table|
@@ -31,8 +31,8 @@ class ActiveRecordTest < Minitest::Test
     assert_equal nik, loaded.orang_nik
 
     stored = ActiveRecord::Base.connection.select_value("SELECT orang_nik FROM orangs")
-    assert Coinx::PII.ciphertext?(stored)
-    assert_equal Coinx::PII.encrypt(nik, column: "orang_nik"), stored
+    assert Fieldseal.ciphertext?(stored)
+    assert_equal Fieldseal.encrypt(nik, column: "orang_nik"), stored
 
     assert_raises(ActiveRecord::RecordNotUnique) do
       OrangRecord.create!(orang_nik: nik)
@@ -49,7 +49,7 @@ class ActiveRecordTest < Minitest::Test
     assert_nil OrangRecord.find_by(orang_nik: legacy)
 
     raw = row.read_attribute_before_type_cast("orang_nik")
-    row.update_column(:orang_nik, Coinx::PII.encrypt(raw, column: "orang_nik"))
+    row.update_column(:orang_nik, Fieldseal.encrypt(raw, column: "orang_nik"))
     assert_equal legacy, OrangRecord.find_by(orang_nik: legacy).orang_nik
   end
 

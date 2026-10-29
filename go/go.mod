@@ -1,4 +1,4 @@
-module github.com/pipigendut/coinx-pii/go
+module github.com/pipigendut/fieldseal/go
 
 go 1.25.0
 

@@ -1,13 +1,13 @@
 {
   "key_hex": "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff",
-  "derived_key_hex": "b2e2d9b4be6481f5b05a77398713b2bc48f9e051183176a960ea41a0785030b0a8a02038a2d9170d79ae9f65d3450279e1f4ec4681c0eebc02f854127245e9f6",
-  "hkdf_salt": "coinx-pii",
+  "derived_key_hex": "531b6ab92d457a9032e483ffe2167d97f4d8f1118cd14f7da486b4469d5fcfb7e0daaa6ce6fbd1bb61ceeb5e90b6e061d6b217effef2316663044dc041143118",
+  "hkdf_salt": "fieldseal",
   "hkdf_info": "aes-256-siv-v1",
   "cases": [
     {
       "column": "orang_nik",
       "plaintext": "3273010101010001",
-      "ciphertext": "v1.ymf/NCU1PcA13zcnz6uz/M7+U8TgsQc8CgxBkJ+g38Q="
+      "ciphertext": "v1.Smazva80wOqz3IAoHmNp6EnRi7IlHGMu9N1K5SQGKB0="
     },
     {
       "column": "orang_nik",
@@ -17,17 +17,17 @@
     {
       "column": "orang_nik",
       "plaintext": " 3273010101010001",
-      "ciphertext": "v1.NpRkhNq3e/ZXLJd5XBrpq6QOAR4bFhVrvSaBjQFrxzcb"
+      "ciphertext": "v1.jNTYTQcGwGly7kgQEz+wlZMUpWYUzaclfIr+mT+KPCJY"
     },
     {
       "column": "orang_npwp_number",
       "plaintext": "3273010101010001",
-      "ciphertext": "v1.asnIZGlKFVvtj69LjKeZUAs7q3XSCEsjwL/CEXEQvWE="
+      "ciphertext": "v1.4l/JXxehIhojW5OI3kG9Yj5FiZbhl9VvlfrCRnzBppw="
     },
     {
       "column": "orang_address",
       "plaintext": "Jalan Merdeka Nomor 17, Jakarta Pusat",
-      "ciphertext": "v1.b7SqO19njJGOeHMC67Zeh2W96pCJk5mDbuV0HGbkWWgolaYEis1dZIvVSp8PYYyPisvNbBk="
+      "ciphertext": "v1.XHzhVr0s1tDv7b1GI13V3mJ8p4tsKRkICMGcSknb2FnZzN6gWP6D1wwroMjzj5t3ShkdOIg="
     }
   ]
 }

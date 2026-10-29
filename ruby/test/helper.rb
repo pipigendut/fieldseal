@@ -2,7 +2,7 @@
 
 require "json"
 require "minitest/autorun"
-require "coinx/pii"
+require "fieldseal"
 
 ROOT = File.expand_path("../..", __dir__)
 TEST_KEY = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"

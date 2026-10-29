@@ -1,4 +1,4 @@
-package pii
+package fieldseal
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	schema.RegisterSerializer("coinx_pii", gormSerializer{})
+	schema.RegisterSerializer("fieldseal", gormSerializer{})
 }
 
 type gormSerializer struct{}
@@ -51,7 +51,7 @@ func decryptStored(column string, dbValue interface{}) (string, bool, error) {
 	case []byte:
 		stored = string(v)
 	default:
-		return "", false, fmt.Errorf("pii db value %T", dbValue)
+		return "", false, fmt.Errorf("fieldseal db value %T", dbValue)
 	}
 	plain, err := Decrypt(column, stored)
 	if err != nil {
@@ -73,13 +73,13 @@ func plaintextOf(value interface{}) (string, bool, error) {
 		}
 		return *v, false, nil
 	default:
-		return "", false, fmt.Errorf("pii field type %T", value)
+		return "", false, fmt.Errorf("fieldseal field type %T", value)
 	}
 }
 
 func assignPlaintext(target reflect.Value, column, plain string, isNull bool) error {
 	if !target.CanSet() {
-		return fmt.Errorf("pii field %s cannot be set", column)
+		return fmt.Errorf("fieldseal field %s cannot be set", column)
 	}
 	switch target.Kind() {
 	case reflect.String:
@@ -91,7 +91,7 @@ func assignPlaintext(target reflect.Value, column, plain string, isNull bool) er
 		return nil
 	case reflect.Pointer:
 		if target.Type().Elem().Kind() != reflect.String {
-			return fmt.Errorf("pii field %s is %s", column, target.Type())
+			return fmt.Errorf("fieldseal field %s is %s", column, target.Type())
 		}
 		if isNull {
 			target.SetZero()
@@ -100,6 +100,6 @@ func assignPlaintext(target reflect.Value, column, plain string, isNull bool) er
 		target.Set(reflect.ValueOf(&plain))
 		return nil
 	default:
-		return fmt.Errorf("pii field %s is %s", column, target.Kind())
+		return fmt.Errorf("fieldseal field %s is %s", column, target.Kind())
 	}
 }

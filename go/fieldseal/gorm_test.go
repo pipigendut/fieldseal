@@ -1,4 +1,4 @@
-package pii_test
+package fieldseal_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/glebarez/sqlite"
-	"github.com/pipigendut/coinx-pii/go/pii"
+	"github.com/pipigendut/fieldseal/go/fieldseal"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
 )
@@ -16,13 +16,13 @@ const gormKeyHex = "00112233445566778899aabbccddeeff00112233445566778899aabbccdd
 
 type person struct {
 	ID       uint   `gorm:"primaryKey"`
-	OrangNIK string `gorm:"column:orang_nik;serializer:coinx_pii"`
+	OrangNIK string `gorm:"column:orang_nik;serializer:fieldseal"`
 }
 
 func (person) TableName() string { return "pii_people" }
 
 func TestGORMRoundTrip(t *testing.T) {
-	if err := pii.Init(gormKeyHex); err != nil {
+	if err := fieldseal.Init(gormKeyHex); err != nil {
 		t.Fatal(err)
 	}
 	sqlLog := &bytes.Buffer{}
@@ -43,7 +43,7 @@ func TestGORMRoundTrip(t *testing.T) {
 		t.Fatalf("loaded %s", loaded.OrangNIK)
 	}
 
-	encrypted, err := pii.Encrypt("orang_nik", nik)
+	encrypted, err := fieldseal.Encrypt("orang_nik", nik)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestGORMRoundTrip(t *testing.T) {
 }
 
 func TestGORMLegacyPlaintext(t *testing.T) {
-	if err := pii.Init(gormKeyHex); err != nil {
+	if err := fieldseal.Init(gormKeyHex); err != nil {
 		t.Fatal(err)
 	}
 	db := openPeopleDB(t, nil)
@@ -92,7 +92,7 @@ func TestGORMLegacyPlaintext(t *testing.T) {
 	if err := db.Save(&row).Error; err != nil {
 		t.Fatal(err)
 	}
-	encrypted, err := pii.Encrypt("orang_nik", legacy)
+	encrypted, err := fieldseal.Encrypt("orang_nik", legacy)
 	if err != nil {
 		t.Fatal(err)
 	}

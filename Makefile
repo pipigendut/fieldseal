@@ -7,8 +7,8 @@ test-go:
 
 test-ruby:
 	bundle exec ruby -Iruby/lib ruby/test/siv_test.rb
-	bundle exec ruby -Iruby/lib ruby/test/pii_test.rb
+	bundle exec ruby -Iruby/lib ruby/test/seal_test.rb
 	bundle exec ruby -Iruby/lib ruby/test/active_record_test.rb
 
 vectors:
-	cd go && UPDATE_VECTORS=1 go test ./pii -run TestUpdateVectors -count=1
+	cd go && UPDATE_VECTORS=1 go test ./fieldseal -run TestUpdateVectors -count=1

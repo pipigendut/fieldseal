@@ -1,4 +1,4 @@
-package pii
+package fieldseal
 
 import (
 	"encoding/hex"

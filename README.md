@@ -1,4 +1,4 @@
-# coinx-pii
+# fieldseal
 
 Enkripsi kolom database yang deterministik, dipakai bersama oleh service Rails dan Go. Plaintext yang sama pada nama kolom yang sama selalu menjadi ciphertext yang sama, jadi `find_by`, `WHERE kolom = ?`, dan unique index tetap jalan tanpa kolom tambahan.
 
@@ -6,7 +6,7 @@ Algoritmanya AES-256-SIV. Nilai kosong tetap kosong. Data lama yang belum berpre
 
 ## Kunci
 
-Satu nilai `PII_KEY` di setiap service yang membaca atau menulis kolom itu. Bentuknya 32 byte, ditulis sebagai 64 karakter hex.
+Satu nilai `FIELDSEAL_KEY` di setiap service yang membaca atau menulis kolom itu. Bentuknya 32 byte, ditulis sebagai 64 karakter hex.
 
 ```sh
 openssl rand -hex 32
@@ -19,10 +19,10 @@ Mengganti kunci membuat ciphertext lama tidak bisa dibuka, dan lookup ikut berub
 Tambahkan di `Gemfile`:
 
 ```ruby
-gem "coinx-pii", git: "git@github.com:pipigendut/coinx-pii.git", tag: "v0.1.0"
+gem "fieldseal", git: "git@github.com:pipigendut/fieldseal.git", tag: "v0.1.0"
 ```
 
-Set `PII_KEY`. Railtie membaca env itu dan memasang helper ke ActiveRecord. Di model, daftarkan nama kolom database:
+Set `FIELDSEAL_KEY`. Railtie membaca env itu dan memasang helper ke ActiveRecord. Di model, daftarkan nama kolom database:
 
 ```ruby
 class Orang < ApplicationRecord
@@ -42,21 +42,21 @@ Orang.find_by(orang_nik: "3273010101010001")
 `where(orang_nik: nik)` ikut mengenkripsi nilai pencarian. Bentuk SQL mentah tidak:
 
 ```ruby
-Orang.where("orang_nik = ?", Coinx::PII.encrypt(nik, column: "orang_nik"))
+Orang.where("orang_nik = ?", Fieldseal.encrypt(nik, column: "orang_nik"))
 ```
 
-`update_columns` dan `update_column` juga melewati type. Kalau memakai itu, enkripsi dulu dengan `Coinx::PII.encrypt`.
+`update_columns` dan `update_column` juga melewati type. Kalau memakai itu, enkripsi dulu dengan `Fieldseal.encrypt`.
 
 ## Go
 
 ```bash
-go get github.com/pipigendut/coinx-pii/go@v0.1.0
+go get github.com/pipigendut/fieldseal/go@v0.1.0
 ```
 
 ```go
-import "github.com/pipigendut/coinx-pii/go/pii"
+import "github.com/pipigendut/fieldseal/go/fieldseal"
 
-if err := pii.Init(os.Getenv("PII_KEY")); err != nil {
+if err := fieldseal.Init(os.Getenv("FIELDSEAL_KEY")); err != nil {
     return err
 }
 ```
@@ -64,13 +64,13 @@ if err := pii.Init(os.Getenv("PII_KEY")); err != nil {
 Di struct, nama kolom pada tag `column` harus sama dengan nama yang didaftarkan di Rails:
 
 ```go
-OrangNIK string `gorm:"column:orang_nik;serializer:coinx_pii"`
+OrangNIK string `gorm:"column:orang_nik;serializer:fieldseal"`
 ```
 
 `Create`, `Save`, dan `First` mengenkripsi dan mendekripsi lewat serializer. Query SQL mentah tidak:
 
 ```go
-enc, err := pii.Encrypt("orang_nik", nik)
+enc, err := fieldseal.Encrypt("orang_nik", nik)
 db.Where("orang_nik = ?", enc)
 ```
 
@@ -85,15 +85,15 @@ Rails:
 ```ruby
 Orang.find_each do |orang|
   raw = orang.read_attribute_before_type_cast("orang_nik")
-  next if raw.blank? || Coinx::PII.ciphertext?(raw)
+  next if raw.blank? || Fieldseal.ciphertext?(raw)
 
-  orang.update_column(:orang_nik, Coinx::PII.encrypt(raw, column: "orang_nik"))
+  orang.update_column(:orang_nik, Fieldseal.encrypt(raw, column: "orang_nik"))
 end
 ```
 
-Go: baca lewat model (plaintext lama tetap terbuka), lalu `Save`. Save menulis ciphertext. Setelah itu lookup memakai `pii.Encrypt`.
+Go: baca lewat model (plaintext lama tetap terbuka), lalu `Save`. Save menulis ciphertext. Setelah itu lookup memakai `fieldseal.Encrypt`.
 
-Pasang SDK ini di setiap proses yang membaca atau menulis kolom, termasuk `Coinx-adm-v2`. Service yang belum dipasang akan menampilkan ciphertext atau menimpa kolom dengan plaintext.
+Pasang library ini di setiap proses yang membaca atau menulis kolom itu. Proses yang belum dipasang akan menampilkan ciphertext atau menimpa kolom dengan plaintext.
 
 ## Batasan
 

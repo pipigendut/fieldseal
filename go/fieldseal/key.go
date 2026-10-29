@@ -1,4 +1,4 @@
-package pii
+package fieldseal
 
 import (
 	"crypto/sha256"
@@ -13,7 +13,7 @@ import (
 
 const (
 	prefix     = "v1."
-	hkdfSalt   = "coinx-pii"
+	hkdfSalt   = "fieldseal"
 	hkdfInfo   = "aes-256-siv-v1"
 	rawKeySize = 32
 	sivKeySize = 64
@@ -24,7 +24,7 @@ var (
 	sivKey []byte
 )
 
-// Init installs the process-wide key. keyHex is the PII_KEY shared with the Rails apps.
+// Init installs the process-wide key. keyHex is the FIELDSEAL_KEY shared with the Rails apps.
 // Calling Init again replaces the key. Existing ciphertext cannot be opened after a
 // replacement until those rows are rewritten, because encryption is deterministic.
 func Init(keyHex string) error {
