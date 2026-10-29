@@ -7,6 +7,11 @@ class SealTest < Minitest::Test
     Fieldseal.key = TEST_KEY
   end
 
+  def test_release_version
+    assert_equal "0.1.0", Fieldseal::VERSION
+    assert_equal "3.2.10", RUBY_VERSION
+  end
+
   def test_vectors
     file = read_fixture("vectors.json")
     Fieldseal.key = file.fetch("key_hex")

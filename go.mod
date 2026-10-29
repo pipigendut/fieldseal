@@ -1,5 +1,7 @@
-module github.com/pipigendut/fieldseal/go
+module github.com/pipigendut/fieldseal
 
+// Go 1.25.0 matches the services that import this module.
+// Raise this line in the same release that raises go in those services.
 go 1.25.0
 
 require (

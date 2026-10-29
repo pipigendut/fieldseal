@@ -2,6 +2,8 @@
 
 source "https://rubygems.org"
 
+ruby "3.2.10"
+
 gemspec
 
 gem "activerecord", "~> 7.0.4"

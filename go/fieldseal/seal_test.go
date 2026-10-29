@@ -6,10 +6,21 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
 const testKeyHex = "00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff"
+
+func TestVersionMatchesReleaseFile(t *testing.T) {
+	body, err := os.ReadFile(filepath.Join(repoRoot(), "VERSION"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.TrimSpace(string(body)) != Version {
+		t.Fatalf("VERSION file %q, constant %q", strings.TrimSpace(string(body)), Version)
+	}
+}
 
 func TestUpdateVectors(t *testing.T) {
 	if os.Getenv("UPDATE_VECTORS") == "" {
